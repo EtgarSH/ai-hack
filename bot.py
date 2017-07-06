@@ -19,16 +19,9 @@ from viberbot.api.viber_requests import ViberUnsubscribedRequest
 
 from flask import Flask, request, Response
 
-logger = logging.getLogger()
-logger.setLevel(logging.DEBUG)
-handler = logging.StreamHandler()
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
 server_configuration = {
     "host": "http://my_server.com",
-    "port": 80,
+    "port": 25565,
 }
 
 bot_configuration = BotConfiguration(
@@ -37,11 +30,24 @@ bot_configuration = BotConfiguration(
     auth_token='4643793ea227d275-7a894dbfc47308e7-8ba014f6e7d19fa8'
 )
 
+# Logging
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
+
+# Bot Server
 viber = Api(bot_configuration)
 app = Flask(__name__)
 
+app.run(host='0.0.0.0', port=server_configuration["port"], debug=True)
+viber.set_webhook("{0}:{1}/".format(server_configuration["host"], server_configuration["port"]))
 
+
+# Simple Echo EVENT
 @app.route('/incoming', methods=['POST'])
 def incoming():
     logger.debug("received request. post data: {0}".format(request.get_data()))
@@ -66,6 +72,3 @@ def incoming():
         logger.warn("client failed receiving message. failure: {0}".format(viber_request))
 
     return Response(status=200)
-
-app.run(host='0.0.0.0', port=80, debug=True)
-viber.set_webhook("{0}:{1}/".format(server_configuration["host"], server_configuration["port"]))
