@@ -2,6 +2,7 @@ from viberbot import Api
 from viberbot.api.bot_configuration import BotConfiguration
 from flask import Flask, request, Response
 
+
 bot_configuration = BotConfiguration(
 	name='InvestBot',
 	avatar='http://viber.com/avatar.jpg',
